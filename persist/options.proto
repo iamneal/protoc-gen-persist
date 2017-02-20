@@ -1,54 +1,50 @@
+// Copyright 2017, TCN Inc.
+// All rights reserved.
+
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+
+//     * Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above
+// copyright notice, this list of conditions and the following disclaimer
+// in the documentation and/or other materials provided with the
+// distribution.
+//     * Neither the name of TCN Inc. nor the names of its
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
+
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 syntax = "proto3";
 
 package persist;
 
 import "google/protobuf/descriptor.proto";
 
-option go_package="git.tcncloud.net/bb-persist/protoc-gen-persist/persist;persist";
+option go_package="github.com/tcncloud/protoc-gen-persist/persist;persist";
 
 
 extend google.protobuf.MethodOptions {
-    RPCImpl rpc = 560560;
-    QLImpl ql = 560565;
+    QLImpl ql = 560000;
 }
 
-extend google.protobuf.FieldOptions {
-  bool pk = 560561;
-  bool auto_gen = 560562;
+enum PersistenceOptions {
+    SQL = 0;
 }
-
-extend google.protobuf.MessageOptions {
-  Table table = 560563;
-}
-
-extend google.protobuf.ServiceOptions {
-    bool rpc_enabled = 560564;
-}
-
-
-enum PersistenceType {
-    POSTGRES = 0;
-    MONGO = 1; // it's unimplemented
-}
-
-message Table {
-    string name = 1;
-    PersistenceType storage = 2;
-}
-
-enum TemplateType {
-    INSERT = 0;
-    READ = 1;
-    BATCH_INSERT = 2;
-    BATCH_READ = 3;
-}
-message RPCImpl {
-
-    TemplateType template = 1;
-}
-
 
 message QLImpl {
     string query = 1;
     repeated string arguments = 2;
+    PersistenceOptions persist = 3;
 }

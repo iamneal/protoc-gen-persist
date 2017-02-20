@@ -27,46 +27,29 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-package main
+package generator
 
-import (
-	"io/ioutil"
-	"log"
-	"os"
+import "github.com/golang/protobuf/protoc-gen-go/plugin"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/protoc-gen-go/plugin"
-)
-
-func Return(response *plugin_go.CodeGeneratorResponse) {
-	data, err := proto.Marshal(response)
-	if err != nil {
-		log.Fatal("That's wired ... ")
-	}
-	_, err = os.Stdout.Write(data)
-	if err != nil {
-		log.Fatal(os.Stderr, "I can't send data to stdout !")
-	}
+type Generator struct {
+	Files           []*string
+	OriginalRequest *plugin_go.CodeGeneratorRequest
 }
 
-func main() {
-	var req plugin_go.CodeGeneratorRequest
-	var res *plugin_go.CodeGeneratorResponse
+func NewGenerator(request *plugin_go.CodeGeneratorRequest) *Generator {
+	ret := new(Generator)
+	ret.OriginalRequest = request
+	return ret
+}
 
-	data, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		res.Error = proto.String("Can't read the input")
-		Return(res)
-		return
+// Process the request
+func (g *Generator) ProcessRequest() {
+	for _, file := range g.OriginalRequest.ProtoFile {
+		for _, service := range file.Service {
+			if IsServicePersistEnabled(service) {
+				// we need to generate code for this service
+
+			}
+		}
 	}
-
-	if err := proto.Unmarshal(data, &req); err != nil {
-		res.Error = proto.String("Error parsing stdin data")
-		Return(res)
-		return
-	}
-	// DO processing
-
-	// Send back the results.
-	Return(res)
 }

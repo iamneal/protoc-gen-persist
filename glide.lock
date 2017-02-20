@@ -1,8 +1,45 @@
-hash: e5641efb2533d098a700a5e5f2ce698f16cd2f71dd5c9e191c69754a06dbe279
-updated: 2017-02-20T00:19:16.461072887-07:00
+hash: 08207789df1cfb47c8da882e5e56e6af7fcdd48f590a9da8b2c5642a59c66427
+updated: 2017-02-20T00:47:46.956106117-07:00
 imports:
+- name: github.com/golang/protobuf
+  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
+  subpackages:
+  - proto
+  - protoc-gen-go/descriptor
+  - protoc-gen-go/plugin
+  - ptypes/timestamp
 - name: github.com/lib/pq
   version: 0477eb88c5ca4009cb281f13c90633375b6a9987
   subpackages:
   - oid
+- name: github.com/onsi/ginkgo
+  version: 462326b1628e124b23f42e87a8f2750e3c4e2d24
+  subpackages:
+  - config
+  - internal/codelocation
+  - internal/containernode
+  - internal/failer
+  - internal/leafnodes
+  - internal/remote
+  - internal/spec
+  - internal/specrunner
+  - internal/suite
+  - internal/testingtproxy
+  - internal/writer
+  - reporters
+  - reporters/stenographer
+  - types
+- name: github.com/onsi/gomega
+  version: a78ae492d53aad5a7a232d0d0462c14c400e3ee7
+  subpackages:
+  - format
+  - internal/assertion
+  - internal/asyncassertion
+  - internal/testingtsupport
+  - matchers
+  - matchers/support/goraph/bipartitegraph
+  - matchers/support/goraph/edge
+  - matchers/support/goraph/node
+  - matchers/support/goraph/util
+  - types
 testImports: []

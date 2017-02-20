@@ -27,46 +27,48 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-package main
+package generator_test
 
 import (
-	"io/ioutil"
-	"log"
-	"os"
+	"compress/gzip"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/protoc-gen-go/plugin"
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+
+	_ "github.com/golang/protobuf/ptypes/timestamp"
+	_ "github.com/tcncloud/protoc-gen-persist/examples"
+
+	"bytes"
+	"io/ioutil"
+	"testing"
 )
 
-func Return(response *plugin_go.CodeGeneratorResponse) {
-	data, err := proto.Marshal(response)
-	if err != nil {
-		log.Fatal("That's wired ... ")
-	}
-	_, err = os.Stdout.Write(data)
-	if err != nil {
-		log.Fatal(os.Stderr, "I can't send data to stdout !")
-	}
+func TestGenerator(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Generator Suite")
 }
 
-func main() {
-	var req plugin_go.CodeGeneratorRequest
-	var res *plugin_go.CodeGeneratorResponse
+var files []*descriptor.FileDescriptorProto
 
-	data, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		res.Error = proto.String("Can't read the input")
-		Return(res)
-		return
-	}
+func LoadDescriptor(file string) *descriptor.FileDescriptorProto {
 
-	if err := proto.Unmarshal(data, &req); err != nil {
-		res.Error = proto.String("Error parsing stdin data")
-		Return(res)
-		return
-	}
-	// DO processing
+	bReader, err := gzip.NewReader(bytes.NewReader(proto.FileDescriptor(file)))
+	defer bReader.Close()
+	Expect(err).To(BeNil())
 
-	// Send back the results.
-	Return(res)
+	buf, err := ioutil.ReadAll(bReader)
+	Expect(err).To(BeNil())
+
+	var descr descriptor.FileDescriptorProto
+	err = proto.Unmarshal(buf, &descr)
+	Expect(err).To(BeNil())
+	return &descr
+
 }
+
+var _ = BeforeSuite(func() {
+	files = append(files, LoadDescriptor("examples/example1.proto"))
+	files = append(files, LoadDescriptor("github.com/golang/protobuf/ptypes/timestamp/timestamp.proto"))
+})

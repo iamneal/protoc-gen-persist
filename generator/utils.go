@@ -27,46 +27,62 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-package main
+package generator
 
 import (
-	"io/ioutil"
-	"log"
-	"os"
+	"strings"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/protoc-gen-go/plugin"
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/tcncloud/protoc-gen-persist/persist"
 )
 
-func Return(response *plugin_go.CodeGeneratorResponse) {
-	data, err := proto.Marshal(response)
-	if err != nil {
-		log.Fatal("That's wired ... ")
+func IsMethodEnabled(method *descriptor.MethodDescriptorProto) bool {
+	if method != nil && method.GetOptions() != nil && proto.HasExtension(method.Options, persist.E_Ql) {
+		return true
 	}
-	_, err = os.Stdout.Write(data)
-	if err != nil {
-		log.Fatal(os.Stderr, "I can't send data to stdout !")
-	}
+	return false
 }
 
-func main() {
-	var req plugin_go.CodeGeneratorRequest
-	var res *plugin_go.CodeGeneratorResponse
-
-	data, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		res.Error = proto.String("Can't read the input")
-		Return(res)
-		return
+func GetMethodExtensionData(method *descriptor.MethodDescriptorProto) *persist.QLImpl {
+	if IsMethodEnabled(method) {
+		ex, err := proto.GetExtension(method.Options, persist.E_Ql)
+		if err != nil {
+			return nil
+		}
+		return ex.(*persist.QLImpl)
 	}
+	return nil
+}
 
-	if err := proto.Unmarshal(data, &req); err != nil {
-		res.Error = proto.String("Error parsing stdin data")
-		Return(res)
-		return
+// check if a service has at least one method that has the persist.ql extension defined
+func IsServicePersistEnabled(service *descriptor.ServiceDescriptorProto) bool {
+	if service.Method != nil {
+		for _, method := range service.Method {
+			if IsMethodEnabled(method) {
+				return true
+			}
+		}
 	}
-	// DO processing
+	return false
+}
 
-	// Send back the results.
-	Return(res)
+func splitType(typ string) (string, string) {
+	typeName := typ[strings.LastIndex(typ, ".")+1 : len(typ)]
+	pkgName := typ[1:strings.LastIndex(typ, ".")]
+	return typeName, pkgName
+}
+
+func FindMessage(files []*descriptor.FileDescriptorProto, typeString string) *descriptor.DescriptorProto {
+	typeName, pkgName := splitType(typeString)
+	for _, file := range files {
+		if pkgName == file.GetPackage() {
+			for _, message := range file.MessageType {
+				if typeName == message.GetName() {
+					return message
+				}
+			}
+		}
+	}
+	return nil
 }

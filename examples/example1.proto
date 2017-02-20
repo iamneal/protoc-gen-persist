@@ -26,47 +26,34 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+syntax = "proto3";
 
-package main
+package examples;
 
-import (
-	"io/ioutil"
-	"log"
-	"os"
+option go_package="github.com/tcncloud/protoc-gen-persist/examples;examples";
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/protoc-gen-go/plugin"
-)
+import "persist/options.proto";
+import "google/protobuf/timestamp.proto";
 
-func Return(response *plugin_go.CodeGeneratorResponse) {
-	data, err := proto.Marshal(response)
-	if err != nil {
-		log.Fatal("That's wired ... ")
-	}
-	_, err = os.Stdout.Write(data)
-	if err != nil {
-		log.Fatal(os.Stderr, "I can't send data to stdout !")
-	}
+message ExampleTable1 {
+    int32 table_id = 1;
+    string key = 2;
+    string value = 3;
 }
 
-func main() {
-	var req plugin_go.CodeGeneratorRequest
-	var res *plugin_go.CodeGeneratorResponse
+message ExternalTypeTestMessage {
+    google.protobuf.Timestamp time = 1;
+}
 
-	data, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		res.Error = proto.String("Can't read the input")
-		Return(res)
-		return
-	}
 
-	if err := proto.Unmarshal(data, &req); err != nil {
-		res.Error = proto.String("Error parsing stdin data")
-		Return(res)
-		return
-	}
-	// DO processing
+service ExampleService1 {
+    rpc UnaryExample1(ExampleTable1) returns (ExampleTable1) {
+        option (persist.ql) = {
+            query: "SELECT id AS table_id, key, value FROM test_table WHERE id = $1"
+            arguments: ["table_id"]
+        };
+    }
 
-	// Send back the results.
-	Return(res)
+    rpc RandomMethod(ExampleTable1) returns (ExampleTable1);
+
 }
