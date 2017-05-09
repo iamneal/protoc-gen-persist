@@ -43,7 +43,11 @@ const BeforeHook = `
 	{{/* client streaming and bidi streaming methods */}}
 	{{$before := .GetMethodOption.GetBefore}}
 		{{if $before}}
-			beforeRes, err := {{.GetGoPackage $before.GetPackage}}.{{$before.GetName}}(req)
+			{{if (eq ($before.GetPackage) .Service.File.GetGoPackage)}}
+				beforeRes, err := {{$before.GetName}}(req)
+			{{else}}
+				beforeRes, err := {{.GetGoPackage $before.GetPackage}}.{{$before.GetName}}(req)
+			{{end}}
 			if err != nil {
 				{{if .IsUnary}}
 					return nil, grpc.Errorf(codes.Unknown, err.Error())
@@ -87,7 +91,11 @@ const AfterHook = `
 	{{/* does not do anything for client streaming methods */}}
 	{{$after := .GetMethodOption.GetAfter}}
 		{{if $after}}
-			err = {{.GetGoPackage $after.GetPackage}}.{{$after.GetName}}(req, &res)
+			{{if (eq ($after.GetPackage) .Service.File.GetGoPackage)}}
+				err = {{$after.GetName}}(req, $res)
+			{{else}}
+				err = {{.GetGoPackage $after.GetPackage}}.{{$after.GetName}}(req, &res)
+			{{end}}
 			if err != nil {
 				{{if .IsUnary}}
 					return nil, grpc.Errorf(codes.Unknown, err.Error())

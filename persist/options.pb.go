@@ -67,6 +67,8 @@ func (PersistenceOptions) EnumDescriptor() ([]byte, []int) { return fileDescript
 
 type QLImpl struct {
 	// the query string with numeric placeholders for parameters
+	// its an array to allow the query to span across multiple lines but it
+	// will be joined and used as a single sql query string at generation time
 	Query []string `protobuf:"bytes,1,rep,name=query" json:"query,omitempty"`
 	// in order list of argument names that will be used as parameters for the query
 	// the list of arguments represents the field names of the input type message

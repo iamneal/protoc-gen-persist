@@ -114,6 +114,14 @@ service ExampleService1 {
         option (persist.ql) = {
             query: ["SELECT id AS \"table_id\", key, value, msg as inner_message, status as inner_enum FROM test_table WHERE id = $1"]
             arguments: ["table_id"]
+            before: {
+              package: "github.com/tcncloud/protoc-gen-persist/examples/sql/little_of_everything"
+              name: "ClientStreamingExampleBefore"
+            }
+            after: {
+              package: "github.com/tcncloud/protoc-gen-persist/examples/sql/little_of_everything"
+              name: "ClientStreamingExampleAfter"
+            }
         };
     }
 

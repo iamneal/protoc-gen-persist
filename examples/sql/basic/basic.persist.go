@@ -68,6 +68,7 @@ func (s *AmazingImpl) UniarySelectWithHooks(ctx context.Context, req *test.Parti
 	)
 
 	beforeRes, err := hooks.UniarySelectBeforeHook(req)
+
 	if err != nil {
 
 		return nil, grpc.Errorf(codes.Unknown, err.Error())
@@ -97,6 +98,7 @@ func (s *AmazingImpl) UniarySelectWithHooks(ctx context.Context, req *test.Parti
 	}
 
 	err = hooks.UniarySelectAfterHook(req, &res)
+
 	if err != nil {
 
 		return nil, grpc.Errorf(codes.Unknown, err.Error())
@@ -156,6 +158,7 @@ func (s *AmazingImpl) ServerStreamWithHooks(req *test.Name, stream Amazing_Serve
 	)
 
 	beforeRes, err := hooks.ServerStreamBeforeHook(req)
+
 	if err != nil {
 
 		return grpc.Errorf(codes.Unknown, err.Error())
@@ -200,6 +203,7 @@ func (s *AmazingImpl) ServerStreamWithHooks(req *test.Name, stream Amazing_Serve
 		}
 
 		err = hooks.ServerStreamAfterHook(req, &res)
+
 		if err != nil {
 
 			return grpc.Errorf(codes.Unknown, err.Error())
@@ -275,6 +279,7 @@ func (s *AmazingImpl) BidirectionalWithHooks(stream Amazing_BidirectionalWithHoo
 		}
 
 		beforeRes, err := hooks.BidirectionalBeforeHook(req)
+
 		if err != nil {
 
 			return grpc.Errorf(codes.Unknown, err.Error())
@@ -313,6 +318,7 @@ func (s *AmazingImpl) BidirectionalWithHooks(stream Amazing_BidirectionalWithHoo
 		}
 
 		err = hooks.BidirectionalAfterHook(req, &res)
+
 		if err != nil {
 
 			return grpc.Errorf(codes.Unknown, err.Error())
@@ -394,6 +400,7 @@ func (s *AmazingImpl) ClientStreamWithHook(stream Amazing_ClientStreamWithHookSe
 		}
 
 		beforeRes, err := hooks.ClientStreamBeforeHook(req)
+
 		if err != nil {
 
 			tx.Rollback()
@@ -418,6 +425,7 @@ func (s *AmazingImpl) ClientStreamWithHook(stream Amazing_ClientStreamWithHookSe
 		}
 
 		err = hooks.ClientStreamAfterHook(req, &res)
+
 		if err != nil {
 
 			tx.Rollback()

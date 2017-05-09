@@ -152,6 +152,13 @@ func (s *MySpannerImpl) UniaryUpdate(ctx context.Context, req *test.ExampleTable
 
 	params := make(map[string]interface{})
 	var conv interface{}
+
+	conv, err = mytime.MyTime{}.ToSpanner(req.StartTime).SpannerValue()
+
+	if err != nil {
+		return nil, grpc.Errorf(codes.Unknown, err.Error())
+	}
+	params["start_time"] = conv
 	conv = "oranges"
 	params["name"] = conv
 
@@ -161,13 +168,6 @@ func (s *MySpannerImpl) UniaryUpdate(ctx context.Context, req *test.ExampleTable
 		return nil, grpc.Errorf(codes.Unknown, err.Error())
 	}
 	params["id"] = conv
-
-	conv, err = mytime.MyTime{}.ToSpanner(req.StartTime).SpannerValue()
-
-	if err != nil {
-		return nil, grpc.Errorf(codes.Unknown, err.Error())
-	}
-	params["start_time"] = conv
 	muts := make([]*spanner.Mutation, 1)
 	muts[0] = spanner.UpdateMap("example_table", params)
 	_, err = s.SpannerDB.Apply(ctx, muts)
@@ -504,6 +504,7 @@ func (s *MySpannerImpl) UniaryInsertWithHooks(ctx context.Context, req *test.Exa
 	var err error
 
 	beforeRes, err := hooks.UniaryInsertBeforeHook(req)
+
 	if err != nil {
 
 		return nil, grpc.Errorf(codes.Unknown, err.Error())
@@ -545,6 +546,7 @@ func (s *MySpannerImpl) UniaryInsertWithHooks(ctx context.Context, req *test.Exa
 	res := test.ExampleTable{}
 
 	err = hooks.UniaryInsertAfterHook(req, &res)
+
 	if err != nil {
 
 		return nil, grpc.Errorf(codes.Unknown, err.Error())
@@ -564,6 +566,7 @@ func (s *MySpannerImpl) UniarySelectWithHooks(ctx context.Context, req *test.Exa
 	)
 
 	beforeRes, err := hooks.UniaryInsertBeforeHook(req)
+
 	if err != nil {
 
 		return nil, grpc.Errorf(codes.Unknown, err.Error())
@@ -630,6 +633,7 @@ func (s *MySpannerImpl) UniarySelectWithHooks(ctx context.Context, req *test.Exa
 	}
 
 	err = hooks.UniaryInsertAfterHook(req, &res)
+
 	if err != nil {
 
 		return nil, grpc.Errorf(codes.Unknown, err.Error())
@@ -644,6 +648,7 @@ func (s *MySpannerImpl) UniaryUpdateWithHooks(ctx context.Context, req *test.Exa
 	var err error
 
 	beforeRes, err := hooks.UniaryUpdateBeforeHook(req)
+
 	if err != nil {
 
 		return nil, grpc.Errorf(codes.Unknown, err.Error())
@@ -686,6 +691,7 @@ func (s *MySpannerImpl) UniaryUpdateWithHooks(ctx context.Context, req *test.Exa
 	res := test.PartialTable{}
 
 	err = hooks.UniaryUpdateAfterHook(req, &res)
+
 	if err != nil {
 
 		return nil, grpc.Errorf(codes.Unknown, err.Error())
@@ -700,6 +706,7 @@ func (s *MySpannerImpl) UniaryDeleteWithHooks(ctx context.Context, req *test.Exa
 	var err error
 
 	beforeRes, err := hooks.UniaryDeleteBeforeHook(req)
+
 	if err != nil {
 
 		return nil, grpc.Errorf(codes.Unknown, err.Error())
@@ -740,6 +747,7 @@ func (s *MySpannerImpl) UniaryDeleteWithHooks(ctx context.Context, req *test.Exa
 	res := test.ExampleTable{}
 
 	err = hooks.UniaryDeleteAfterHook(req, &res)
+
 	if err != nil {
 
 		return nil, grpc.Errorf(codes.Unknown, err.Error())
@@ -758,6 +766,7 @@ func (s *MySpannerImpl) ServerStreamWithHooks(req *test.Name, stream MySpanner_S
 	)
 
 	beforeRes, err := hooks.ServerStreamBeforeHook(req)
+
 	if err != nil {
 
 		return grpc.Errorf(codes.Unknown, err.Error())
@@ -818,6 +827,7 @@ func (s *MySpannerImpl) ServerStreamWithHooks(req *test.Name, stream MySpanner_S
 		}
 
 		err = hooks.ServerStreamAfterHook(req, &res)
+
 		if err != nil {
 
 			return grpc.Errorf(codes.Unknown, err.Error())
@@ -846,6 +856,7 @@ func (s *MySpannerImpl) ClientStreamUpdateWithHooks(stream MySpanner_ClientStrea
 		}
 
 		beforeRes, err := hooks.ClientStreamUpdateBeforeHook(req)
+
 		if err != nil {
 
 			return grpc.Errorf(codes.Unknown, err.Error())
@@ -895,6 +906,7 @@ func (s *MySpannerImpl) ClientStreamUpdateWithHooks(stream MySpanner_ClientStrea
 	for _, req := range reqs {
 
 		err = hooks.ClientStreamUpdateAfterHook(req, &res)
+
 		if err != nil {
 
 			return grpc.Errorf(codes.Unknown, err.Error())

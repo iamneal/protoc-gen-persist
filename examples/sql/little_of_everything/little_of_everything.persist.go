@@ -11,6 +11,7 @@ context "golang.org/x/net/context"
 grpc "google.golang.org/grpc"
 codes "google.golang.org/grpc/codes"
 mytime "github.com/tcncloud/protoc-gen-persist/examples/mytime"
+little_of_everything "github.com/tcncloud/protoc-gen-persist/examples/sql/little_of_everything"
 test "github.com/tcncloud/protoc-gen-persist/examples/test"
 )
 type ExampleService1Impl struct {
@@ -30,7 +31,7 @@ func (s* ExampleService1Impl) UnaryExample1 (ctx context.Context, req *ExampleTa
 		
 		BytesField []byte
 		InnerEnum int32
-		InnerMessage ExampleTable1_InnerMessage
+		InnerMessage little_of_everything.ExampleTable1_InnerMessage
 		Key string
 		StartTime mytime.MyTime
 		StringArray []string
@@ -59,7 +60,7 @@ func (s* ExampleService1Impl) UnaryExample1 (ctx context.Context, req *ExampleTa
 	res := ExampleTable1{
 	
 	BytesField: BytesField,
-	InnerEnum: ExampleTable1_InnerEnum(InnerEnum),
+	InnerEnum: little_of_everything.ExampleTable1_InnerEnum(InnerEnum),
 	InnerMessage: &InnerMessage,
 	Key: Key,
 	StartTime: StartTime.ToProto(),
@@ -84,7 +85,7 @@ func (s* ExampleService1Impl) UnaryExample2 (ctx context.Context, req *test.Test
 		
 		BytesField []byte
 		InnerEnum int32
-		InnerMessage ExampleTable1_InnerMessage
+		InnerMessage little_of_everything.ExampleTable1_InnerMessage
 		Key string
 		StartTime mytime.MyTime
 		StringArray []string
@@ -113,7 +114,7 @@ func (s* ExampleService1Impl) UnaryExample2 (ctx context.Context, req *test.Test
 	res := ExampleTable1{
 	
 	BytesField: BytesField,
-	InnerEnum: ExampleTable1_InnerEnum(InnerEnum),
+	InnerEnum: little_of_everything.ExampleTable1_InnerEnum(InnerEnum),
 	InnerMessage: &InnerMessage,
 	Key: Key,
 	StartTime: StartTime.ToProto(),
@@ -138,7 +139,7 @@ func (s *ExampleService1Impl) ServerStreamSelect(req *ExampleTable1, stream Exam
  
  BytesField []byte
  InnerEnum int32
- InnerMessage ExampleTable1_InnerMessage
+ InnerMessage little_of_everything.ExampleTable1_InnerMessage
  Key string
  StartTime mytime.MyTime
  StringArray []string
@@ -176,7 +177,7 @@ func (s *ExampleService1Impl) ServerStreamSelect(req *ExampleTable1, stream Exam
 		res := ExampleTable1{
 		
 		BytesField: BytesField,
-		InnerEnum: ExampleTable1_InnerEnum(InnerEnum),
+		InnerEnum: little_of_everything.ExampleTable1_InnerEnum(InnerEnum),
 		InnerMessage: &InnerMessage,
 		Key: Key,
 		StartTime: StartTime.ToProto(),
@@ -225,6 +226,24 @@ func (s *ExampleService1Impl) ClientStreamingExample(stream ExampleService1_Clie
 	
 	
 		
+			
+				beforeRes, err := little_of_everything.ClientStreamingExampleBefore(req)
+			
+			if err != nil {
+				
+					tx.Rollback()
+					return grpc.Errorf(codes.Unknown, err.Error())
+				
+			}
+			if beforeRes != nil {
+				
+					continue
+				
+				
+				
+				
+			}
+		
 	
 		_, err = stmt.Exec(req.TableId)
 		if err != nil {
@@ -240,6 +259,16 @@ func (s *ExampleService1Impl) ClientStreamingExample(stream ExampleService1_Clie
 	
 	
 	
+		
+			
+				err = little_of_everything.ClientStreamingExampleAfter(req, &res)
+			
+			if err != nil {
+				
+					tx.Rollback()
+					return grpc.Errorf(codes.Unknown, err.Error())
+				
+			}
 		
 	
 	}

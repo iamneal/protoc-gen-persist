@@ -76,21 +76,21 @@ test: deps build
 
 test-compile:
 	go build
-	DEBUG=true $(PROTOC) -I$(PROTOC_INCLUDE) -I. -I$$GOPATH/src \
+#	DEBUG=true $(PROTOC) -I$(PROTOC_INCLUDE) -I. -I$$GOPATH/src \
+#		--plugin=./protoc-gen-persist \
+#		--persist_out=.  examples/sql/basic/*.proto
+#	DEBUG=true $(PROTOC) -I$(PROTOC_INCLUDE) -I. -I$$GOPATH/src \
+#		--plugin=./protoc-gen-persist \
+#		--persist_out=.  examples/spanner/basic/*.proto
+#	DEBUG=true $(PROTOC) -I$(PROTOC_INCLUDE) -I. -I$$GOPATH/src \
+#		--plugin=./protoc-gen-persist \
+#		--persist_out=.  examples/spanner/delete/*.proto
+#	DEBUG=true $(PROTOC) -I$(PROTOC_INCLUDE) -I. -I$$GOPATH/src \
+#		--plugin=./protoc-gen-persist \
+#		--persist_out=.  examples/spanner/bob_example/*.proto
+	$(PROTOC) -I$(PROTOC_INCLUDE) -I. -I$$GOPATH/src \
 		--plugin=./protoc-gen-persist \
 		--persist_out=.  examples/sql/little_of_everything/*.proto
-	DEBUG=true $(PROTOC) -I$(PROTOC_INCLUDE) -I. -I$$GOPATH/src \
-		--plugin=./protoc-gen-persist \
-		--persist_out=.  examples/sql/basic/*.proto
-	DEBUG=true $(PROTOC) -I$(PROTOC_INCLUDE) -I. -I$$GOPATH/src \
-		--plugin=./protoc-gen-persist \
-		--persist_out=.  examples/spanner/basic/*.proto
-	DEBUG=true $(PROTOC) -I$(PROTOC_INCLUDE) -I. -I$$GOPATH/src \
-		--plugin=./protoc-gen-persist \
-		--persist_out=.  examples/spanner/delete/*.proto
-	DEBUG=true $(PROTOC) -I$(PROTOC_INCLUDE) -I. -I$$GOPATH/src \
-		--plugin=./protoc-gen-persist \
-		--persist_out=.  examples/spanner/bob_example/*.proto
 
 
 test-sql-impl: build

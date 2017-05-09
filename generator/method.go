@@ -478,6 +478,7 @@ func (m *Method) Process() error {
 }
 
 func (m *Method) ProcessImports() {
+	logrus.Warnf("processing imports: service package: %s\n", m.Service.File.GetGoPackage())
 	if m.GetMethodOption() != nil {
 		if m.GetMethodOption().GetMapping() != nil {
 			for _, mapping := range m.GetMethodOption().GetMapping().GetTypes() {
@@ -488,10 +489,11 @@ func (m *Method) ProcessImports() {
 		// name string, package string
 		beforeOpt := m.GetMethodOption().GetBefore()
 		afterOpt := m.GetMethodOption().GetAfter()
-		if beforeOpt != nil {
+		if beforeOpt != nil && (beforeOpt.GetPackage() != m.Service.File.GetGoPackage()) {
+			logrus.Infof("before package: %s\n service package: %s\n", beforeOpt.GetPackage(), m.Service.File.GetGoPackage())
 			m.Service.File.ImportList.GetOrAddImport(GetGoPackage(beforeOpt.GetPackage()), GetGoPath(beforeOpt.GetPackage()))
 		}
-		if afterOpt != nil {
+		if afterOpt != nil && (afterOpt.GetPackage() != m.Service.File.GetGoPackage()) {
 			m.Service.File.ImportList.GetOrAddImport(GetGoPackage(afterOpt.GetPackage()), GetGoPath(afterOpt.GetPackage()))
 		}
 	}
